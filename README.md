@@ -28,9 +28,9 @@ Create Item: Tạo ảnh mới và lưu vào localStorage
 
 5. framework UI sử dụng
 Công nghệ:
-Next.js (App Router): Framework React hiện đại, hỗ trợ routing, SSR, API routes
-Tailwind CSS: Thư viện CSS tiện dụng, hỗ trợ dark mode qua class dark:
-React: Thư viện UI chính, dùng cho component và state
-Jest + React: Testing Library	
+Next.js (App Router)
+Tailwind CSS
+React
+Jest + React
 
 6. Demo: https://explore-gallery-kappa.vercel.app/
