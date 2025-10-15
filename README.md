@@ -26,3 +26,4 @@ Sort: Sắp xếp theo lượt thích hoặc thời gian tạo
 Infinite Scroll: Tải thêm ảnh khi cuộn xuống
 Create Item: Tạo ảnh mới và lưu vào localStorage
 
+5. Demo: https://explore-gallery-kappa.vercel.app/
