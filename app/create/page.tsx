@@ -5,41 +5,46 @@ import { useRouter } from "next/navigation";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import CreateItemForm from "@/components/CreateItemForm";
 import type { FormState } from "@/components/CreateItemForm";
+import { Photo } from "@/src/lib/mockData";
+
+type CreateItemPayload = Omit<Photo, "id" | "likes" | "source">;
 
 export default function CreatePage() {
   const router = useRouter();
   const queryClient = useQueryClient();
 
   const createItemMutation = useMutation({
-    mutationFn: async (payload: any) => {
+    mutationFn: async (payload: CreateItemPayload): Promise<Photo> => {
       const res = await fetch("/api/items", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
+
       if (!res.ok) {
         const err = await res.json();
         throw new Error(err?.message || "Failed to create item");
       }
+
       return res.json();
     },
-    onSuccess: (data) => {
+    onSuccess: (data: Photo) => {
       const stored = localStorage.getItem("customItems");
-      const customItems = stored ? JSON.parse(stored) : [];
+      const customItems: Photo[] = stored ? JSON.parse(stored) : [];
       customItems.push(data);
       localStorage.setItem("customItems", JSON.stringify(customItems));
 
       queryClient.invalidateQueries({ queryKey: ["items"] });
       router.push(`/detail/${data.id}`);
     },
-    onError: (err: any) => {
-      alert(err.message || "Something went wrong");
+    onError: (err: unknown) => {
+      if (err instanceof Error) alert(err.message);
+      else alert("Something went wrong");
     },
   });
 
   const handleSubmit = (form: FormState) => {
-    const payload = {
-      id: Date.now().toString(),
+    const payload: CreateItemPayload = {
       title: form.title.trim(),
       src: form.image.trim(),
       category: form.category,
@@ -49,7 +54,6 @@ export default function CreatePage() {
         .filter(Boolean),
       description: form.description.trim(),
       author: "You",
-      likes: 0,
       createdAt: new Date().toISOString(),
     };
 

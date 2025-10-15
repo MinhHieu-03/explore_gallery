@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { mockData } from "@/src/lib/mockData";
 import SearchFilter from "./SearchFilterBar";
+import Image from "next/image";
 
 type Photo = {
   id: string;
@@ -52,7 +53,8 @@ export default function ExploreClient() {
     setTimeout(() => {
       try {
         const stored = localStorage.getItem("customItems");
-        const customItems = stored ? JSON.parse(stored) : [];
+        const customItems: Photo[] = stored ? JSON.parse(stored) : [];
+
         let filtered = [...customItems, ...mockData];
 
         if (debouncedQuery)
@@ -76,10 +78,12 @@ export default function ExploreClient() {
 
         setItems((prev) => [...prev, ...next]);
         setHasMore(next.length === PAGE_LIMIT);
-      } catch (err: any) {
-        setError(err.message || "Failed to load");
-      } finally {
-        setLoading(false);
+      } catch (err) {
+        if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError("Failed to load");
+        }
       }
     }, 500);
   }, [debouncedQuery, category, sort, page]);
@@ -116,13 +120,15 @@ export default function ExploreClient() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {items.map((p, index) => (
           <div
-            key={`${p.id}-${index}`} // key duy nhất ngay cả khi id trùng
+            key={`${p.id}-${index}`}
             onClick={() => router.push(`/item/${p.id}`)}
             className="bg-white rounded shadow overflow-hidden cursor-pointer hover:shadow-md transition"
           >
-            <img
+            <Image
               src={p.src}
               alt={p.title}
+              width={400}
+              height={240}
               className="w-full h-60 object-cover"
             />
             <div className="p-3">

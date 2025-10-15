@@ -2,11 +2,12 @@
 
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { mockData } from "@/src/lib/mockData";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 
-type Photo = {
+export type Photo = {
   id: string;
   title: string;
   src: string;
@@ -22,31 +23,26 @@ type Photo = {
 export default function ItemDetailPage() {
   const { id } = useParams();
   const router = useRouter();
-  const [item, setItem] = useState<any>(null);
-  const [related, setRelated] = useState<any[]>([]);
+  const [item, setItem] = useState<Photo | null>(null);
+  const [related, setRelated] = useState<Photo[]>([]);
   const [likes, setLikes] = useState<number>(0);
 
   const queryClient = useQueryClient();
 
   const likeMutation = useMutation({
-    mutationFn: async (item: any) => {
+    mutationFn: async (item: Photo) => {
       await fetch(`/api/items/${item.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...item, likes: item.likes + 1 }),
       });
     },
-    onMutate: async (item) => {
+    onMutate: async (item: Photo) => {
       await queryClient.cancelQueries({ queryKey: ["items"] });
-
-      const previous = queryClient.getQueryData(["items"]);
-
-      queryClient.setQueryData(["items"], (old: any) =>
-        old.map((i: any) =>
-          i.id === item.id ? { ...i, likes: i.likes + 1 } : i
-        )
+      const previous = queryClient.getQueryData<Photo[]>(["items"]);
+      queryClient.setQueryData<Photo[]>(["items"], (old = []) =>
+        old.map((i) => (i.id === item.id ? { ...i, likes: i.likes + 1 } : i))
       );
-
       return { previous };
     },
     onError: (_err, _item, context) => {
@@ -65,9 +61,9 @@ export default function ItemDetailPage() {
     const stored = localStorage.getItem("customItems");
     const customItems: Photo[] = stored ? JSON.parse(stored) : [];
 
-    const allItems = [
-      ...customItems.map((i) => ({ ...i, source: "custom" })),
-      ...mockData.map((i) => ({ ...i, source: "mock" })),
+    const allItems: Photo[] = [
+      ...customItems.map((i) => ({ ...i, source: "custom" as const })),
+      ...mockData.map((i) => ({ ...i, source: "mock" as const })),
     ];
 
     const found = allItems.find((x) => x.id === id);
@@ -82,19 +78,19 @@ export default function ItemDetailPage() {
     setRelated(
       allItems.filter((x) => x.category === found.category && x.id !== found.id)
     );
-  }, [id]);
+  }, [id, router]);
 
   if (!item) return <div className="p-6">Loading...</div>;
 
-  const likeItem = (item: any) => {
-    const updatedItem = { ...item, likes: item.likes + 1 };
+  const likeItem = (item: Photo) => {
+    const updatedItem: Photo = { ...item, likes: item.likes + 1 };
     setItem(updatedItem);
     setLikes(updatedItem.likes);
 
     if (item.source === "custom") {
       const stored = localStorage.getItem("customItems");
-      const customItems = stored ? JSON.parse(stored) : [];
-      const updatedList = customItems.map((i: any) =>
+      const customItems: Photo[] = stored ? JSON.parse(stored) : [];
+      const updatedList = customItems.map((i) =>
         i.id === item.id ? updatedItem : i
       );
       localStorage.setItem("customItems", JSON.stringify(updatedList));
@@ -108,10 +104,12 @@ export default function ItemDetailPage() {
       <button className="text-sm text-blue-600 hover:underline mb-4">
         <Link href={"/"}>← home</Link>
       </button>
-      <img
+      <Image
         src={item.src}
         alt={item.title}
-        className="w-full h-96 object-cover rounded-lg mb-4"
+        width={700} 
+        height={340} 
+        className="w-full h-60 object-cover"
       />
 
       <h1 className="text-3xl font-bold mb-2">{item.title}</h1>
@@ -141,10 +139,12 @@ export default function ItemDetailPage() {
             onClick={() => router.push(`/item/${r.id}`)}
             className="cursor-pointer"
           >
-            <img
+            <Image
               src={r.src}
               alt={r.title}
-              className="w-full h-40 object-cover rounded"
+              width={400}
+              height={240}
+              className="w-full h-60 object-cover"
             />
             <p className="text-sm mt-1">{r.title}</p>
           </div>

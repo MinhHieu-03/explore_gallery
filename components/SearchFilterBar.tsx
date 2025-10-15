@@ -79,6 +79,13 @@ export default function SearchFilter({
           <option value="latest">Latest</option>
         </select>
       </div>
+      {/* Nút Create */}
+      <button
+        onClick={onCreateClick}
+        className="p-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+      >
+        + Create
+      </button>
     </div>
   );
 }

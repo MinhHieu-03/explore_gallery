@@ -1,8 +1,13 @@
 import { NextResponse } from "next/server";
+export interface Item {
+  id: string;
+  title: string;
+  category?: string;
+  likes?: number;
+}
 
-export let items: any[] = []; // ✅ Mảng tạm để lưu dữ liệu
+export const items: Item[] = [];
 
-// Tạo item mới
 export async function POST(req: Request) {
   const body = await req.json();
   const newItem = { id: Date.now().toString(), likes: 0, ...body };
@@ -10,7 +15,6 @@ export async function POST(req: Request) {
   return NextResponse.json(newItem, { status: 201 });
 }
 
-// Lấy toàn bộ item (hoặc lọc theo category)
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const category = searchParams.get("category");
