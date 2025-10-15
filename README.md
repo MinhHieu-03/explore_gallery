@@ -26,4 +26,11 @@ Sort: Sắp xếp theo lượt thích hoặc thời gian tạo
 Infinite Scroll: Tải thêm ảnh khi cuộn xuống
 Create Item: Tạo ảnh mới và lưu vào localStorage
 
-5. Demo: https://explore-gallery-kappa.vercel.app/
+5. framework UI sử dụng
+Công nghệ:
+Next.js (App Router): Framework React hiện đại, hỗ trợ routing, SSR, API routes
+Tailwind CSS: Thư viện CSS tiện dụng, hỗ trợ dark mode qua class dark:
+React: Thư viện UI chính, dùng cho component và state
+Jest + React: Testing Library	
+
+6. Demo: https://explore-gallery-kappa.vercel.app/
